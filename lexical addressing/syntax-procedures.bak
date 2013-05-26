@@ -1,0 +1,102 @@
+
+<!-- saved from url=(0100)http://cs.uni.edu/~wallingf/teaching/cs3540/sessions/session18/lexical-address/syntax-procedures.rkt -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><style type="text/css"></style></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">;;  ------------------------------------------------------------------------
+;; |                                                                        |
+;; |   FILE           :   syntax-procs.rkt                                  |
+;; |   AUTHOR         :   Eugene Wallingford                                |
+;; |   CREATION DATE  :   March 14, 2013                                    |
+;; |                                                                        |
+;; |   DESCRIPTION    :   These procedures implement standard syntax        |
+;; |                      functions for a simplified grammar consisting     |
+;; |                      only of variable references, lambda expressions,  |
+;; |                      applications, and if expressions.                 |
+;; |                                                                        |
+;;  ------------------------------------------------------------------------
+;; |                                                                        |
+;; |   MODIFIED BY    :                                                     |
+;; |   DATE           :                                                     |
+;; |   DESCRIPTION    :                                                     |
+;; |                                                                        |
+;;  ------------------------------------------------------------------------
+
+;;
+;;   This code works with the following grammar:
+;;
+;;        &lt;exp&gt;        ::= &lt;varref&gt;
+;;                       | ( lambda &lt;parameters&gt; &lt;exp&gt; )
+;;                       | &lt;exp-list&gt;
+;;                       | ( if &lt;exp&gt; &lt;exp&gt; &lt;exp&gt; )
+;;
+;;        &lt;parameters&gt; ::= ()
+;;                       | (&lt;var&gt; . &lt;parameters&gt;)
+;;
+;;        &lt;exp-list&gt;   ::= (&lt;exp&gt;)
+;;                       | (&lt;exp&gt; . &lt;exp-list&gt;)
+;;
+
+;;  ------------------------------------------------------------------------
+;;  exp
+
+(define exp?
+  (lambda (exp)
+    (or (varref? exp)
+        (lambda? exp)
+        (app?    exp)
+        (if?     exp))))
+
+;;  ------------------------------------------------------------------------
+;;  varref
+
+(define varref? symbol?)
+
+;;  ------------------------------------------------------------------------
+;;  lambda
+
+(define lambda?
+  (lambda (exp)
+    (and (list? exp)
+         (= (length exp) 3)
+         (eq? (car exp) 'lambda)
+         (every? varref? (cadr exp))
+         (exp? (caddr exp)))))
+
+(define lambda-&gt;formals cadr)
+(define lambda-&gt;body    caddr)
+
+;;  ------------------------------------------------------------------------
+;;  application
+
+(define app?
+  (lambda (exp)
+    (and (list? exp)
+         (&gt;= (length exp) 1)
+         (every? exp? exp))))
+
+(define app-&gt;procedure car)
+(define app-&gt;arguments cdr)
+
+;;  ------------------------------------------------------------------------
+;;  application
+
+(define if?
+  (lambda (exp)
+    (and (list? exp)
+         (eq? (car exp) 'if)
+         (= (length exp) 4)
+         (every? exp? (cdr exp)))))
+
+(define if-&gt;test cadr)
+(define if-&gt;then caddr)
+(define if-&gt;else cadddr)
+
+;;  ------------------------------------------------------------------------
+;;  utilities
+
+(define every?
+  (lambda (test? lst)
+    (or (null? lst)
+        (and(test? (car lst))
+            (every? test? (cdr lst))))))
+
+;; ----- END OF FILE -------------------------------------------------------
+</pre></body></html>

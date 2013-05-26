@@ -1,0 +1,47 @@
+;;
+;; FILE:     homework08.rkt
+;; AUTHOR:   Taylor Brown
+;; DATE:     03/29/13
+;; COMMENT:  More syntactic abstractions
+;;           
+;;
+;; MODIFIED: none yet
+;; CHANGE:   none yet
+;;
+;; -----------------------------------------------------------
+;; Problem 1
+;; -----------------------------------------------------------
+(define **xx** '**xx**)
+(define record
+  (lambda field-names
+    (list->vector (map (lambda (n)
+                         (vector n **xx**))
+                       field-names))))
+(define find-pos-record
+  (lambda (record field pos)
+    (cond ((>= pos (vector-length record)) -1)
+          ((eq? (vector-ref (vector-ref record pos) 0) field) pos)
+          (else (find-pos-record record field (+ 1 pos))))))
+(define record-put
+  (lambda (record field value)
+      (vector-set! record (find-pos-record record field 0) (vector field value))
+      record))
+(define record-get
+  (lambda (record field)
+    (vector-ref (vector-ref record (find-pos-record record field 0)) 1)))
+;; -----------------------------------------------------------
+;; Problem 2
+;; -----------------------------------------------------------
+(define run-length-encode
+  (lambda (lst)
+    (letrec ((encode-helper
+              (lambda (lst prev-val amt-repeat)
+                (if (null? lst)
+                    (cons (cons prev-val amt-repeat) '())
+                    (if (eq? (car lst) prev-val)
+                        (encode-helper (cdr lst) (car lst) (+ 1 amt-repeat))
+                        (cons (if (> amt-repeat 2)
+                                  (cons prev-val amt-repeat)
+                                  prev-val)
+                              (encode-helper (cdr lst) (car lst) 1)))))))
+      (encode-helper lst (car lst) 0))))

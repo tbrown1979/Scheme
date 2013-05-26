@@ -1,0 +1,72 @@
+Welcome to DrRacket, version 5.3.1 [3m].
+Language: R5RS; memory limit: 128 MB.
+>Problem1
+(define if-test1 '(if <exp1> <exp2> <exp3>))
+(if->test if-test1)
+<exp1>
+(if->then if-test1)
+<exp2>
+(if->else if-test1)
+<exp3>
+#t
+(define if-test2 '(if))
+#f
+(define if-test3 '(if <exp1> <exp2>))
+#f
+(define if-test4 '(blurp <exp1> <exp2> <exp3>))
+#f
+(-------------------------------------------------------)
+>Problem2
+(let? '(let (x (lambda (x) y)) <body>))
+#t
+(define let1 '(let (<var> <val>) <body>))
+#t
+(define let2 '(ex (<var> <val>) <body>))
+#f
+(-------------------------------------------------------)
+>Problem3
+(let->app '(let (a b) a))
+((lambda (a) a) b)
+(let->app '(let (x i) (f x)))
+((lambda (x) (f x)) i)
+(let->app '(let (a b) ((lambda (x) (a x)) a)))
+((lambda (a) ((lambda (x) (a x)) a)) b)
+(-------------------------------------------------------)
+>Problem4
+(and->if '(and a b))
+(if a b f)
+(and->if '(and (f x) (f b)))
+(if (f x) (f b) f)
+(and->if '(and ((lambda (x) (f x)) a) (f b)))
+(if ((lambda (x) (f x)) a) (f b) f)
+(or->if '(or a b))
+(if a t b)
+(or->if '(or (f x) (f b)))
+(if (f x) t (f b))
+(if ((lambda (x) (f x)) a) t (f b))
+(or->if '(or ((lambda (x) (f x)) a) (f b)))
+(-------------------------------------------------------)
+>Problem5
+(types-match? (list number?) (list 42))
+#t
+(types-match? (list number? string?) (list 42 "Hello, Eugene"))
+#t
+(types-match? (list number? string?) (list "eugene" "eugene"))
+#f
+(types-match? (list procedure? list?) (list cdr '((6 3 8) (10 9 8) (3 4 2 6))))
+#t
+(types-match? (list list? procedure?) (list cdr '((6 3 8) (10 9 8) (3 4 2 6))))
+#f
+(types-match? (list number? string?) (list 42 "Eugene" "Wallingford"))
+#t
+(types-match? (list number? string?) (list 42 "Eugene" 'wallingford))
+#f
+(types-match? (list procedure? list?) (list cdr '(6 3 8) '(10 9 8) '(3 4 2 6)))
+#t
+(types-match? (list number?) (list '(6 3 8) 10 9 8 '(3 4 2 6)))
+#f
+(types-match? (list number?) (list 6 3 8 10 9 8 3 4 2 6))
+#t
+(types-match? '() '())
+#t
+> 

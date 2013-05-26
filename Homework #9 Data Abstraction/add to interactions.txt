@@ -1,0 +1,37 @@
+Welcome to DrRacket, version 5.3.1 [3m].
+Language: eopl; memory limit: 128 MB.
+> (define small-tree (leaf-node 0))
+> (define large-tree (interior-node 'foo
+                                   (interior-node 'bar
+                                                  (leaf-node 1)
+                                                  (leaf-node 2))
+                                   (leaf-node 3)))
+> (define large-tree (interior-node 'foo
+                                        (interior-node 'bar
+                                                       (leaf-node 1)
+                                                       (leaf-node 2))
+                                        (leaf-node 3)))
+> (define larger-tree (interior-node 'rasp
+                                   (interior-node 'lasp
+                                                  (interior-node 'clasp
+                                                                 (leaf-node 1)
+                                                                 (leaf-node 2))
+                                                  (interior-node 'sasp
+                                                                 (leaf-node 3)
+                                                                 (leaf-node 4)))
+                                   (interior-node 'zasp
+                                                  (interior-node 'grasp
+                                                                 (leaf-node 5)
+                                                                 (leaf-node 6))
+                                                  (interior-node '...
+                                                                 (leaf-node 7)
+                                                                 (leaf-node 8))) ))
+> (bintree-member? 3 small-tree)
+#f
+> (bintree-member? 3 large-tree)
+#t
+> (bintree-member? 9 larger-tree)
+#f
+> (bintree-member? 8 larger-tree)
+#t
+> 

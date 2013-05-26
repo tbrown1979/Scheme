@@ -1,0 +1,19 @@
+(define int->bignum 
+  (lambda (n)
+    (letrec ((big->num-accum 
+              (lambda (n accum)
+                (cond ((and (zero? n) (null? accum)) (list n))
+                      ((zero? n) accum)
+                      (else (big->num-accum (quotient n 10)
+                                            (append accum (list (modulo n 10)))))))))
+      (big->num-accum n '()))))
+                                
+;;;;;SYNTAX PROCEDURESSSSSS MAKE THEM!!!!!!!!!!
+(define bignum->int 
+  (lambda (n)
+    (letrec ((bignum->int-accum
+              (lambda (n accum count)
+                (cond 
+                  ((null? n) accum)
+                  (else (bignum->int-accum (cdr n) (+ (* (car n) count) accum) (* count 10)))))))
+      (bignum->int-accum n 0 1))))

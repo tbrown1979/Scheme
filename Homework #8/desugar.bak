@@ -1,0 +1,28 @@
+;; -----------------------------------------------------------
+;; and/or ---> if
+;; -----------------------------------------------------------
+
+(define and->1st-arg cadr)
+(define and->2nd-arg caddr)
+
+(define and->if
+  (lambda (and-exp)
+    (list 'if (and->1st-arg and-exp) (and->2nd-arg and-exp) 'f)))
+
+(define or->1st-arg cadr)
+(define or->2nd-arg caddr)
+
+(define or->if
+  (lambda (or-exp)
+    (list 'if (or->1st-arg or-exp) 't (or->2nd-arg or-exp))))
+
+;; -----------------------------------------------------------
+;; let--->app
+;; -----------------------------------------------------------
+
+(define let->app
+  (lambda (let-exp)
+    (list (list 'lambda 
+                (list (let->local-var let-exp))
+                (let->body let-exp) )
+          (binding->value (let->binding let-exp)) )))

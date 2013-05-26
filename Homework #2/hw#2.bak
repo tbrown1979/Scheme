@@ -1,0 +1,19 @@
+(define candy-temperature 
+        (lambda (temp ft) 
+          (- temp (/ ft 500.0))))
+
+(define grade 
+        (lambda (hw quiz final)
+          (/ (+ (* hw 35) (* quiz 35) (* final 30)) 100 )))
+
+(define ladder-height
+        (lambda (c a)
+          (sqrt (- (expt c 2) (expt a 2) ) ) ) )
+          
+(define in-range?
+        (lambda (a b)
+          (< (abs(- a b)) *epsilon*)))
+
+(define string-binding?
+        (lambda ( binding )
+          (

@@ -1,0 +1,16 @@
+Welcome to DrRacket, version 5.3.1 [3m].
+Language: R5RS; memory limit: 128 MB.
+> (boom/eval '(with test = 5 do (if (test > 5) @t @f)))
+@f
+> (boom/eval '(if 5 1 0))
+1
+> (boom/eval '(if @f 1 0))
+0
+> (boom/eval '(if 'pup 1 0))
+(boom -- illegal expression: (boom -- illegal expression: (if 'pup 1 0)))
+> (boom/eval '(if pup 1 0))
+1
+> (boom/run)
+(with x = 10 do (begin (x <= 5) (if (x > 5) (begin (x <= 2) x end) (if (x > 4) 451 0)) end))
+451
+.

@@ -1,0 +1,91 @@
+Welcome to DrRacket, version 5.3.1 [3m].
+Language: R5RS; memory limit: 128 MB.
+> (bindings)
+()
+> (bind 'foo 2 (bindings))
+((foo . 2))
+> (bind 'bar 5 (bind 'foo 2 (bindings)))
+((bar . 5) (foo . 2))
+> (define env (bind 'bar 5 (bind 'foo 2 (bindings))))
+> (look-up env 'foo)
+2
+> (look-up env 'baz)
+(error "environment does not contain variable" baz)
+> (boom/exp? 'pi)
+#t
+> (boom/exp? 'i)
+#t
+> (boom/number? 'e)
+#f
+> (boom/varref? 'e)
+#t
+> (boom/exp? '(pi * (2 * 2)))
+#t
+> (boom/exp? '(2 * e))
+#t
+> (boom/exp? '(2 * (2 * (2 * (2 * (2 * (2 * e)))))))
+#t
+> (boom/preprocess 'pi)
+pi
+> (boom/preprocess '(((3.14 - 2) / e) % (15 / (pi % 2))))
+(((3.14 - 2) / e) % (15 / (pi % 2)))
+> (boom/preprocess '(((3.14 - 2) / e) @ (15 / (pi % 2))))
+((((3.14 - 2) / e) + (15 / (pi % 2))) / 2)
+> (boom/preprocess '(3 @ e))
+((3 + e) / 2)
+> (boom/preprocess '((2 * e) + (pi @ 29)))
+((2 * e) + ((pi + 29) / 2))
+> (boom/eval 'pi)
+3.1415927
+> (boom/eval '(e @ 2))
+2.3591409
+> (boom/eval '(((130 - 2) / 4) % (15 / (17 % 6))))
+2
+> (boom/eval '(((3.14 - 2) / e) @ (15 / (pi * 2))))
+1.403353339218536
+> (boom/eval '((2 * e) + (pi @ 29)))
+21.507359949999998
+> (boom/preprocess '(with x = 2 do (x * 14)))
+(with x = 2 do (x * 14))
+> (boom/preprocess '(with x = 2 do (x @ 14)))
+(with x = 2 do ((x + 14) / 2))
+> (boom/preprocess '(with x = (pi @ 14) do x))
+(with x = ((pi + 14) / 2) do x)
+> (boom/preprocess '(with x = (3 @ 14) do (x / 3)))
+(with x = ((3 + 14) / 2) do (x / 3))
+> (boom/preprocess '(with x = 2 do
+                              (with y = 10 do
+                                    ((15 + x) @ (y * 7.4)))))
+(with x = 2 do (with y = 10 do (((15 + x) + (y * 7.4)) / 2)))
+> (boom/preprocess '(with x = 2 do
+                              ( (with y = 15 do (y * x))
+                                @
+                                (with y = 77 do (y / x)) )))
+(with x = 2 do (((with y = 15 do (y * x)) + (with y = 77 do (y / x))) / 2))
+> (boom/eval '(with x = 2 do (x * 14)))
+28
+> (boom/eval '(with x = 2 do (x @ 14)))
+8
+> (boom/eval '(with x = (pi @ 14) do x))
+8.57079635
+> (boom/eval '(with x = (3 @ 14) do (x / 3)))
+2
+> (boom/eval '(with x = 2 do
+                       (with y = 10 do
+                             ((15 + x) @ (y * 7.4)))))
+45.5
+> (boom/eval '(with x = 2 do
+                       ( (with y = 15 do (y * x))
+                         @
+                         (with y = 77 do (y / x)) )))
+34
+> (boom/eval '(with x = 2 do (- x)))
+-2
+> (boom/eval '(with x = 2 do
+                       (with y = 10 do
+                             (((sqrt 16) + (- x)) @ ((- y) * 7.4)))))
+-36.0
+> (boom/eval '(- pi))
+-3.1415927
+> (boom/eval '(- e))
+-2.7182818

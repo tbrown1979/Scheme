@@ -1,0 +1,249 @@
+;;  ------------------------------------------------------------------------
+;; |                                                                        |
+;; |   FILE           :   boom-language.rkt                                 |
+;; |   AUTHOR         :   Kyle Mueller                                      |
+;; |   CREATION DATE  :   April 9, 2013                                     |
+;; |                                                                        |
+;; |   DESCRIPTION    :   Syntax procedures for the Boom language as        |
+;; |                      well as a solution for boom/eval, which evaluates |
+;; |                      proper Boom expressions.                          |
+;; |                                                                        |
+;; |                                                                        |
+;;  ------------------------------------------------------------------------
+;; |                                                                        |
+;; |   EDIT           :   Added syntax procedures for unary operations      |
+;; |                      negate and sqrt, as well as a preprocessor        |
+;; |   DATE           :   April 15, 2013                                    |
+;; |                                                                        |
+;;  ------------------------------------------------------------------------
+;; |                                                                        |
+;; |   EDIT           :   Added finite function bindings ability to         |
+;; |                      utilize pi and e variables                        |
+;; |   DATE           :   April 15, 2013                                    |
+;; |                                                                        |
+;;  ------------------------------------------------------------------------
+;;
+;;   Boom's grammar:
+;;
+;;   <exp>      ::= <number>  
+;;                | ( <unary-operator> <exp> )
+;;                | ( <exp> <operator> <exp> )
+;;                | <variable>                             Added HMWRK 11
+;;                | ( with <var> = <exp> do <exp> )        Added HMWRK 11
+;;
+;;   <unary-operator> ::= - | sqrt
+;;   <operator> ::= + | - | * | / | % | @
+;;           
+;;  ------------------------------------------------------------------------
+;;  Added for homework 11
+
+(define bindings
+  (lambda ()
+    '()))
+
+(define bind
+  (lambda (sym val binding)
+    (cons (cons sym val)
+          binding)))
+
+(define look-up
+  (lambda (sym environment)
+    (let ((val (assoc sym environment)))
+      (if val
+          (cdr val)
+          (error-report "environment does not contain variable")))))
+
+;;  ------------------------------------------------------------------------
+
+(define boom/number-exp? number?)
+
+(define identity (lambda (x) x))
+
+(define boom/number-val-of identity)
+
+;;  ------------------------------------------------------------------------
+;;  Added for homework 11
+
+(define boom/varref-exp? symbol?)
+
+(define boom/varref-val-of identity)
+
+;;  ------------------------------------------------------------------------
+
+(define with/do-exp?
+  (lambda (exp)
+    (and (list? exp)
+         (= (length exp) 6)
+         (eq? (with/do->with exp) 'with)
+         (eq? (with/do->var exp) 'x)
+         (eq? (with/do->= exp) '=)
+         (eq? (with/do->do exp) 'do))))
+
+(define with/do->with car)
+(define with/do->var cadr)
+(define with/do->val cadddr)
+(define with/do->= caddr)
+(define with/do->do (lambda (exp) (cadddr (cdr exp))))
+(define with/do->formula (lambda (exp) (cadddr (cddr exp))))
+
+;;  ------------------------------------------------------------------------
+
+(define boom/exp?
+  (lambda (exp)
+    (or (boom/number-exp? (boom/number-val-of exp))
+        (boom/varref-exp? (boom/varref-val-of exp))
+        (boom/unary? exp)
+        (boom/equation? exp)
+        (with/do-exp? exp))))
+
+(define boom/exp?w/new-env
+  (lambda (exp new-env)
+    (or (boom/number-exp? (boom/number-val-of exp))
+        (boom/varref-exp?w/new-env (boom/varref-val-of exp) new-env)
+        (boom/unary? exp)
+        (boom/equation? exp)
+        (with/do-exp? exp))))
+
+;;  ------------------------------------------------------------------------
+
+(define boom/operator?
+  (lambda (op)
+    (member op *operators*)))
+
+(define *operators* '(+ - * / % @))
+(define % remainder)
+;;(define @ (lambda args (/ (apply + args) (length args)) ))
+
+(define boom/unary-operator?
+  (lambda (op)
+    (member op *unary-operators*)))
+
+(define *unary-operators* '(- sqrt))
+
+;;  ------------------------------------------------------------------------
+
+(define boom/unary?
+  (lambda (exp)
+    (and (list? exp)
+         (= 2 (length exp))
+         (boom/unary-operator? (boom/unary-op-value-of exp))
+         (boom/exp? (boom/unary-arg-value-of exp)) )))
+
+(define boom/unary-op-value-of car)
+(define boom/unary-arg-value-of cadr)
+
+;;  ------------------------------------------------------------------------
+
+(define boom/equation?
+  (lambda (exp)
+    (and (list? exp)
+         (= 3 (length exp))
+         (boom/exp? (boom/equation-first-value exp))
+         (boom/operator? (boom/binary-op-value-of exp))
+         (boom/exp? (boom/equation-second-value exp)) )))
+
+;(define boom/equation?w/new-env
+;  (lambda (exp new-env)
+;    (and (list? exp)
+;         (= 3 (length exp))
+;         (boom/exp?w/new-env (boom/equation-first-value exp) new-env)
+;         (boom/operator? (boom/binary-op-value-of exp))
+;         (boom/exp?w/new-env (boom/equation-second-value exp) new-env) )))
+
+(define boom/equation-first-value car)
+(define boom/binary-op-value-of cadr)
+(define boom/equation-second-value caddr)
+
+;;  ------------------------------------------------------------------------
+
+(define boom/eval-exp
+  (lambda (exp env)
+    (cond ((boom/number-exp? (boom/number-val-of exp)) exp)
+          ((boom/varref-exp? exp) (look-up (boom/varref-val-of exp) env))
+          ((boom/unary? exp) ((return-unary-proc (boom/unary-op-value-of exp)) 
+                              (boom/eval-exp (boom/unary-arg-value-of exp) env)))
+          ((boom/equation? exp)
+           (let ((first (boom/eval-exp (boom/equation-first-value exp) env))
+                 (second (boom/eval-exp (boom/equation-second-value exp) env))
+                 (op-ints (return-proc-ints (boom/binary-op-value-of exp)))
+                 (op (return-proc (boom/binary-op-value-of exp))))
+             (if (and (integer? first) (integer? second))
+                 (op-ints (boom/eval-exp first) (boom/eval-exp second))
+                 (op (boom/eval-exp first) (boom/eval-exp second)))))
+          ((with/do-exp? exp) (boom/eval-exp (with/do->formula) 
+                                             (bind (with/do->var exp) 
+                                                   (with/do->val exp) 
+                                                   env)) ))
+    
+    (error-report "boom/eval-exp: Invalid equation") ))
+
+(define return-proc-ints
+  (lambda (operator)
+    (cond ((eq? operator '+) +)
+          ((eq? operator '-) -)
+          ((eq? operator '*) *)
+          ((eq? operator '/) quotient)
+          ((eq? operator '%) remainder) )))
+
+(define return-proc
+  (lambda (operator)
+    (cond ((eq? operator '+) +)
+          ((eq? operator '-) -)
+          ((eq? operator '*) *)
+          ((eq? operator '/) /)
+          ((eq? operator '%) remainder) )))
+
+(define return-unary-proc
+  (lambda (operator)
+    (cond ((eq? operator 'sqrt) sqrt)
+          ((eq? operator '-) (lambda (num) (- 0 num))) )))
+
+;;  ------------------------------------------------------------------------
+
+(define boom/preprocess-helper
+  (lambda (sugared-exp)
+    (cond ((boom/number-exp? (boom/number-val-of sugared-exp)) sugared-exp)
+          ((boom/varref-exp? sugared-exp) sugared-exp)
+          ((boom/unary? sugared-exp) (list (boom/unary-op-value-of sugared-exp)
+                                           (boom/preprocess-helper (boom/unary-arg-value-of sugared-exp))))
+          ((boom/equation? sugared-exp)
+           (if (eq? (boom/binary-op-value-of sugared-exp) '@)
+               (list (list (boom/preprocess-helper (boom/equation-first-value sugared-exp))
+                           '+
+                           (boom/preprocess-helper (boom/equation-second-value sugared-exp)))
+                     '/
+                     2)
+               (list (boom/preprocess-helper (boom/equation-first-value sugared-exp))
+                     (boom/binary-op-value-of sugared-exp)
+                     (boom/preprocess-helper (boom/equation-second-value sugared-exp))) ))
+          ((with/do-exp? sugared-exp)
+             (list 'with
+                   (with/do->var sugared-exp)
+                   '=
+                   (with/do->var sugared-exp)
+                   'do
+                   (boom/preprocess-helper (with/do->formula sugared-exp))))
+          
+          (else (error-report "boom/eval-exp: Invalid equation") ))))
+
+;;  ------------------------------------------------------------------------
+
+(define boom/preprocess
+  (lambda (sugared-exp)
+    (boom/preprocess-helper sugared-exp)))
+
+;;  ------------------------------------------------------------------------
+
+(define boom/eval
+  (lambda (exp)
+    (boom/eval-exp base-env (boom/preprocess exp))))
+
+(define base-env (bind 'pi 3.1415926535 (bind 'e 2.7182818284 (bindings))))
+
+;;  -----------------------------------------------------------------------
+
+(define error-report
+  (lambda (message)
+    (list 'error message)))
+
+;;  ------------------------------------------------------------------------

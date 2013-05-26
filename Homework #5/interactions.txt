@@ -1,0 +1,68 @@
+Welcome to DrRacket, version 5.3.1 [3m].
+Language: R5RS; memory limit: 128 MB.
+> Problem 1
+> (all-positive? '(1 -2 3 4))
+#f
+> (all-positive? '((1 (2 7 (10))) (-3 4)))
+#f
+> (all-positive? '((1 (2 7 (10))) (3 4)))
+#t
+> (all-positive? '(((((((((((((1))))))))))))))
+#t
+> (all-positive? '())
+#t
+>
+>Problem 2
+>
+> (reject even? '(1 -2 3 4))
+(1 3)
+> (reject positive? '(1 -2 3 4))
+(-2)
+> (reject (lambda (n) (< n 4))
+                 '((1 (2 7 (10))) (3 4)))
+(7 10 4)
+> (reject negative? '((1 (2 7 (10))) (3 4)))
+(1 2 7 10 3 4)
+> (reject positive? '((1 (2 7 (10))) (3 4)))
+()
+> (reject number? '((1 (2 7 (10))) (3 4)))
+()
+>
+>Problem 3
+>
+> (inject 0 + '(25 50 -30 45 -10 -15))
+65
+> (inject 955.52 + '(27.52 27.52 -50.00 37.52 -50.00))
+948.0799999999999
+> (inject 0 max (reject (lambda (n) (> n 6))
+                         '((1 (2 7 (-10))) (3 3))))
+3
+>
+>Problem 4
+>
+> (uniq '((a b) (((b g r) (f r)) c (d e)) b))
+(e d c f r g b a)
+> (uniq '((a a) (((a (a) (a a)) (a (aaaa))) a (a a)) a))
+(aaaa a)
+> (uniq '(define map-slst
+                (lambda (f slst)
+                  (if (null? slst)
+                      '()
+                      (cons (map-sym-expr f (car slst))
+                            (map-slst     f (cdr slst)))))))
+(cdr car map-sym-expr cons quote null? if slst f lambda map-slst define)
+> (uniq '(() ()))
+()
+>
+>Problem 5
+>
+> (prefix->infix '(* (+ 4 5)
+                          (+ 7 6)))
+((4 + 5) * (7 + 6))
+> (prefix->infix '(* (* (+ 3 5)
+                             (- 3 (/ 4 3)))
+                          (- 25 4)))
+(((3 + 5) * (3 - (4 / 3))) * (25 - 4))
+> (prefix->infix '(* (* (+ 3 5) (- 3 (/ 4 3))) (- (* (+ 4 5) (+ 7 6)) 4)))
+(((3 + 5) * (3 - (4 / 3))) * (((4 + 5) * (7 + 6)) - 4))
+

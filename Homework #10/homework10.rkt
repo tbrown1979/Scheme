@@ -1,0 +1,122 @@
+;; -----------------------------------------------------------
+;; Problem 1 int->bignum 
+;; -----------------------------------------------------------
+;; -----------------------------------------------------------
+;; Syntax procedures -----------------------------------------
+(define bignum->1s-pos car)
+(define bignum->minus-1s-pos cdr)
+(define bignum-zero? null?)
+(define bignum-zero '())
+;; -----------------------------------------------------------
+;; -----------------------------------------------------------
+(define int->bignum 
+  (lambda (n)
+    (letrec ((big->num-accum 
+              (lambda (n accum)
+                (cond ((and (zero? n) (bignum-zero? accum)) (list n))
+                      ((zero? n) accum)
+                      (else (big->num-accum (quotient n 10)
+                                            (append accum (list (modulo n 10)))))))));maybe not use append
+      (big->num-accum n bignum-zero))))
+;; -----------------------------------------------------------
+;; Problem 2 bignum->int 
+;; -----------------------------------------------------------
+(define bignum->int 
+  (lambda (n)
+    (letrec ((bignum->int-accum
+              (lambda (n accum count)
+                (cond 
+                  ((bignum-zero? n) accum)
+                  (else (bignum->int-accum (bignum->minus-1s-pos n)
+                                           (+ (* (bignum->1s-pos n) count) accum) 
+                                           (* count 10)))))))
+      (bignum->int-accum n 0 1))))
+;; -----------------------------------------------------------
+;; Problem 3 big+ 
+;; -----------------------------------------------------------
+(define big+
+  (lambda (m n)
+    (big+helper m n 0)))
+
+(define big+helper
+  (lambda (m n carry)
+    (if (and (bignum-zero? m) (bignum-zero? n)) 
+        (final-carry carry)
+        (let ((added-bignums (add-carry (cond
+                                          ((bignum-zero? m) (bignum->1s-pos n))
+                                          ((bignum-zero? n) (bignum->1s-pos m))
+                                          (else (+ (bignum->1s-pos m) (bignum->1s-pos n))))
+                                        carry)))
+          (cons (subtract-for-carry added-bignums)
+                (big+helper (minus-if-not-zero m)
+                            (minus-if-not-zero n)
+                            (get-carry added-bignums) ))))))
+;; -----------------------------------------------------------
+;; Extra----Small helpers
+;; -----------------------------------------------------------
+(define get-carry
+  (lambda (n)
+    (if (big-carry? n)
+        1
+        0)))
+(define subtract-for-carry
+  (lambda (n)
+    (if (big-carry? n)
+        (- n 10)
+        n)))
+(define big-carry?
+  (lambda (n)
+    (> n 9)))
+(define add-carry
+  (lambda (n carry)
+    (+ n carry)))
+(define minus-if-not-zero
+  (lambda (n)
+    (if (bignum-zero? n)
+        n
+        (bignum->minus-1s-pos n))))
+(define final-carry
+  (lambda (carry)
+    (if (= carry 0)
+        bignum-zero
+        (int->bignum carry))))
+;; -----------------------------------------------------------
+;; ----- tests -----------------------------------------------
+;; -----------------------------------------------------------
+'(int->bignum 0)
+(int->bignum 0)
+'(int->bignum 16)
+(int->bignum 16)
+'(int->bignum 4256)
+(int->bignum 4256)
+'(int->bignum 262144)
+(int->bignum 262144)
+'(bignum->int '(0))
+(bignum->int '(0))
+'(bignum->int '(6 1))
+(bignum->int '(6 1))
+'(bignum->int '(6 5 2 4))
+(bignum->int '(6 5 2 4))
+'(bignum->int '(4 4 1 2 6 2))
+(bignum->int '(4 4 1 2 6 2))
+'----------
+'(big+ (int->bignum 321) (int->bignum 321))
+(big+ (int->bignum 321) (int->bignum 321))
+'(big+ (int->bignum 15) (int->bignum 257))
+(big+ (int->bignum 15) (int->bignum 257))
+'(big+ (int->bignum 4191) (int->bignum 65))
+(big+ (int->bignum 4191) (int->bignum 65))
+'(define big4191 (int->bignum 4191))
+(define big4191 (int->bignum 4191))
+'(define big65   (int->bignum 65))
+(define big65   (int->bignum 65))
+'(bignum->int (big+ big4191 big65))
+(bignum->int (big+ big4191 big65))
+'(big+ (int->bignum 81) (int->bignum 51))
+(big+ (int->bignum 81) (int->bignum 51))
+'(define six-nines (int->bignum 999999))
+(define six-nines (int->bignum 999999))
+'(bignum->int (big+ six-nines six-nines))
+(bignum->int (big+ six-nines six-nines))
+'(big+ (int->bignum 4991) (int->bignum 65))
+(big+ (int->bignum 4991) (int->bignum 65))

@@ -1,0 +1,109 @@
+
+<!-- saved from url=(0088)http://cs.uni.edu/~wallingf/teaching/cs3540/homework/support/homework07/syntax-procs.rkt -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><style type="text/css"></style></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">;;  ------------------------------------------------------------------------
+;; |                                                                        |
+;; |   FILE           :   syntax-procs.rkt                                  |
+;; |   AUTHOR         :   Eugene Wallingford                                |
+;; |   CREATION DATE  :   February 17, 2004                                 |
+;; |                                                                        |
+;; |   DESCRIPTION    :   These procedures implement standard syntax        |
+;; |                      functions for a simplified grammar consisting     |
+;; |                      only of variable references, if expressions,      |
+;; |                      lambda expressions, applications.                 |
+;; |                                                                        |
+;;  ------------------------------------------------------------------------
+;; |                                                                        |
+;; |   MODIFIED BY    :   March 8, 2013                                     |
+;; |   DATE           :   Eugene Wallingford                                |
+;; |   DESCRIPTION    :   Extended the language to include boolean          |
+;; |                      values and boolean connectives.                   |
+;; |                                                                        |
+;;  ------------------------------------------------------------------------
+
+;;   LL's grammar:
+;;
+;;   &lt;exp&gt;      ::= &lt;varref&gt;                         CORE
+;;                | &lt;boolean&gt;                        CORE     (new)
+;;                | ( lambda ( &lt;varref&gt; ) &lt;exp&gt; )    CORE
+;;                | ( &lt;exp&gt; &lt;exp&gt; )                  CORE
+;;                | ( if &lt;exp&gt; &lt;exp&gt; &lt;exp&gt; )         CORE     (HW 07)
+;;                | ( let (&lt;var&gt; &lt;exp&gt;) &lt;exp&gt; )      ABSTRACT (HW 07)
+;;                | ( and &lt;exp&gt; &lt;exp&gt; )              ABSTRACT (new)
+;;                | ( or &lt;exp&gt; &lt;exp&gt; )               ABSTRACT (new)
+;;
+;;    &lt;boolean&gt; ::= t | f                            CORE     (new)
+;;
+;;    &lt;binding&gt; ::= (&lt;var&gt; &lt;exp&gt;)                    ABSTRACT (HW 07)
+
+;;  ------------------------------------------------------------------------
+
+(define varref? symbol?)
+
+;;  ------------------------------------------------------------------------
+
+(define boolean-exp?
+  (lambda (exp)
+    (and (symbol? exp)
+         (or (eq? 't exp)
+             (eq? 'f exp)))))
+
+;;  ------------------------------------------------------------------------
+
+(define lambda?
+  (lambda (exp)
+    (and (list? exp)
+         (= (length exp) 3)
+         (eq? (car exp) 'lambda)
+         (varref? (caadr exp))
+         (exp? (caddr exp)))))
+
+(define lambda-&gt;parameter caadr)
+(define lambda-&gt;body      caddr)
+
+;;  ------------------------------------------------------------------------
+
+(define app?
+  (lambda (exp)
+    (and (list? exp)
+         (= (length exp) 2)
+         (exp? (car exp))
+         (exp? (cadr exp)))))
+
+(define app-&gt;procedure car)
+(define app-&gt;argument  cadr)
+
+;;  ------------------------------------------------------------------------
+
+(define and?
+  (lambda (exp)
+    (and (list? exp)
+         (= 3 (length exp))
+         (eq? 'and (car exp))
+         (exp? (cadr exp))
+         (exp? (caddr exp)))))
+
+(define or?
+  (lambda (exp)
+    (and (list? exp)
+         (= 3 (length exp))
+         (eq? 'or (car exp))
+         (exp? (cadr exp))
+         (exp? (caddr exp)))))
+
+(define and-&gt;clauses cdr)
+(define or-&gt;clauses  cdr)
+
+;;  ------------------------------------------------------------------------
+
+(define exp?
+  (lambda (exp)
+    (or (boolean-exp? exp)
+        (varref? exp)
+        (lambda? exp)
+        (app? exp)
+        (if? exp)          ;; you write this for HW 07
+        (let? exp)         ;; you write this for HW 07
+        (and? exp)
+        (or?exp))))
+
+;; ----- END OF FILE -----</pre></body></html>

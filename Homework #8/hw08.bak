@@ -1,0 +1,33 @@
+(define curry-lambda
+  (lambda (lambda-exp)
+    (if (null? (lambda->cdr-of-args lambda-exp))
+        (list (list lambda-exp) (lambda->body lambda-exp))
+        (list 'lambda 
+              (list (lambda->1st-arg lambda-exp))
+              (curry-lambda 
+                     (change-lambda-params lambda-exp 
+                                           (lambda->cdr-of-args lambda-exp) ))
+              ))))
+
+(define lambda->1st-arg caadr)
+(define lambda->2nd-arg cadadr)
+(define lambda->cdr-of-args cdadr)
+(define lambda->body caddr)
+
+(define change-lambda-params
+  (lambda (lambda-exp new-params)
+    (list 'lambda new-params (lambda->body lambda-exp)) ))
+
+(define curry
+  (lambda (app-exp)
+    (curry-app (reverse app-exp))))
+
+(define curry-app
+  (lambda (app-exp)
+    (if (null? (cdr app-exp))
+        (car app-exp)
+        (list (curry-app (cdr app-exp)) (car app-exp)))))
+
+(define curry-app-test
+  (lambda (app-exp)
+    (list (list (car app-exp) (cadr app-exp)) (caddr app-exp))))

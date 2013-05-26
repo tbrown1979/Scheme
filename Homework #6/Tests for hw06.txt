@@ -1,0 +1,64 @@
+'Problem1
+'(zip '(a b c) '(1 2 3))
+(zip '(a b c) '(1 2 3))
+'-----
+'(zip '() '() )
+(zip '() '() )
+'-----
+'Problem2
+'(tails '(a b c d e f g))
+(tails '(a b c d e f g))
+'-----
+'(tails '((a b) (c d)))
+(tails '((a b) (c d)))
+'-----
+'(tails '())
+(tails '())
+'-----
+'Problem3
+'(swap 'a 'b '((a b) (((b g r) (f r)) c (d e)) b))
+(swap 'a 'b '((a b) (((b g r) (f r)) c (d e)) b))
+'-----
+'(swap 'a 'b '((a a) (((a (a) (a a)) (a (aaaa))) a (a a)) a))
+(swap 'a 'b '((a a) (((a (a) (a a)) (a (aaaa))) a (a a)) a))
+'-----
+'(swap 'x 'b '((a a) (((a (a) (a a)) (a (aaaa))) a (a a)) a))
+(swap 'x 'b '((a a) (((a (a) (a a)) (a (aaaa))) a (a a)) a))
+'-----
+'Problem4
+'(uniq-c '((a b) (((b g r) (f r)) c (d e)) b))
+(uniq-c '((a b) (((b g r) (f r)) c (d e)) b))
+'-----
+'(uniq-c '((a a) (((a (a) (a a)) (a (aaaa))) a (a a)) a))
+(uniq-c '((a a) (((a (a) (a a)) (a (aaaa))) a (a a)) a))
+'-----
+'(uniq-c '((x x ((((x)))) xx)))
+(uniq-c '((x x ((((x)))) xx)))
+'-----
+'(uniq-c '((((((((((x)))))))))))
+(uniq-c '((((((((((x)))))))))))
+'-----
+'(uniq-c '(x x x x x))
+(uniq-c '(x x x x x))
+'-----
+'Problem5
+'(bst? '(8 (3 1 5) (15 12 20)))
+(bst? '(8 (3 1 5) (15 12 20)))
+'-----
+'(bst? '(8 (3 1 12) (15 5 20)))
+(bst? '(8 (3 1 12) (15 5 20)))
+'-----
+'(bst? '(8 (1 3 12) (15 12 20)))
+(bst? '(8 (1 3 12) (15 12 20)))
+'-----
+'(bst? '(8 (3 1 (5 4 6)) (15 (12 10 14) 20)))
+(bst? '(8 (3 1 (5 4 6)) (15 (12 10 14) 20)))
+'-----
+'(bst? '(8 1 9))
+(bst? '(8 1 9))
+'-----
+'(bst? '(8 (3 (1 0 2) (5 4 6)) (15 (12 10 14) (20 16 21))));;not right
+(bst? '(8 (3 (1 0 2) (5 4 6)) (15 (12 10 14) (20 16 21))))
+'-----
+'(bst? '(8 8 8))
+(bst? '(8 8 8))

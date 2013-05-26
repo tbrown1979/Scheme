@@ -1,0 +1,64 @@
+Welcome to DrRacket, version 5.3.1 [3m].
+Language: R5RS; memory limit: 128 MB.
+> (define foo (cell 0))
+> (cell-value foo)
+0
+> (cell-set! foo 10)
+10
+> (cell-value foo)
+10
+> (define bar (cell "Welcome to the Monkey House"))
+> (cell-value bar)
+"Welcome to the Monkey House"
+> (cell-value foo)
+10
+> (cell-set! bar (substring (cell-value bar) 0 8))
+"Welcome "
+> (cell-value bar)
+"Welcome "
+> (boom/eval '(with x = 2 do (x <= 14)))
+14
+> (boom/eval '(with size = 4 do (size <= (size % 3))))
+1
+> (boom/eval '(with x = 26 do
+                        (begin
+                          (x <= (x * 2))
+                          (x @ 30)
+                         end)))
+41
+> (boom/eval '(with left = 0 do
+                     (with right = 10 do
+                       (begin
+                         (left  <= (left @ right))
+                         (right <= (left @ right))
+                         (left * right)
+                        end))))
+35
+> (boom/run)
+(with x = 2 do (x * 14))
+28
+(with x = (3 @ 14) do (x / 3))
+2
+(with result = (5 / 2) do (begin (result <= (result * 2)) result end))
+4
+> (boom/eval '(with test = 5 do (if (test > 5) @t @f)))
+@f
+> (boom/eval '(if 5 1 0))
+1
+> (boom/eval '(if @f 1 0))
+0
+> (boom/eval '(if 'pup 1 0))
+(boom -- illegal expression: (boom -- illegal expression: (if 'pup 1 0)))
+> (boom/eval '(if pup 1 0))
+1
+> (boom/run)
+(with x = 10 do (begin (x <= 5) (if (x > 5) (begin (x <= 2) x end) (if (x > 4) 451 0)) end))
+451
+(with x = 10 do (with x = 2 do (x <= 33)))
+33
+(with result = 5 do (if (result > 4) @t @f))
+@t
+(4 > 2)
+@t
+(4 < 2)
+@f

@@ -1,0 +1,25 @@
+(load "syntax-procedures.rkt")
+
+(define lexical-address
+  (lambda (exp)
+    (cond ((lambda? exp) (list 'lambda
+                               (lambda->formals exp)
+                               (lexical-address (lambda->body exp)) ))
+          ((varref? exp) exp)
+          
+          ((if? exp) (list 'if
+                           (lexical-address (if->test exp))
+                           (lexical-address (if->then exp))
+                           (lexical-address (if->else exp)) ))
+          
+          ((app? exp) (list (lexical-address (app->procedure exp))
+                            (lexical-address (app->arguments exp)) ))
+          
+          )))
+
+
+  ;do app and if first!!! lambda is where you hit a new block. New variable declarations. 
+          
+;(define lexical-address-helper
+;  (lambda (exp)
+    

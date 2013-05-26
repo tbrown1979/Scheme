@@ -1,0 +1,59 @@
+;;
+;; FILE:     homework03.rkt
+;; AUTHOR:   Taylor Brown
+;; DATE:     02/13/13
+;; COMMENT:  Practice at creating recursive procedures. 
+;;
+;; MODIFIED: none yet
+;; CHANGE:   none yet
+;;
+
+(define drop
+  (lambda (to-drop los)
+    (if (or (null? los) (<= to-drop 0))
+        los
+        (drop (- to-drop 1) (cdr los)))))
+
+
+(define any?
+  (lambda (lob)
+    (if (null? lob)
+        #f
+        (or (car lob)
+            (any? (cdr lob))))))
+
+(define count
+  (lambda (look-for los)
+    (if (null? los)
+        0
+        (if (eq? look-for (car los))
+            (+ 1 (count look-for (cdr los)))
+            (count look-for (cdr los))))))
+            
+(define detect
+  (lambda (test lst)
+    (if (null? lst)
+        #f
+        (if (test (car lst))
+            (car lst)
+            (detect test (cdr lst))))))
+
+(define positions-of
+  (lambda (look-for los)
+    (positions-of-helper look-for los 0)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define positions-of-helper
+  (lambda (look-for los pos)
+    (if (null? los)
+        '()
+        (if (eq? look-for (car los))
+            (cons pos (positions-of-helper look-for (cdr los) (+ 1 pos)))
+            (positions-of-helper look-for (cdr los) (+ 1 pos))))))
+
+(define sequence
+  (lambda (start finish)
+    (if (> start finish)
+        '()
+        (cons start (sequence (+ start 1) finish)))))

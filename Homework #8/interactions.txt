@@ -1,0 +1,93 @@
+Welcome to DrRacket, version 5.3.1 [3m].
+Language: R5RS; memory limit: 128 MB.
+problem1
+(curry-lambda '(lambda (a b) ((f a) b)))
+((lambda (a) (lambda (b) ((f a) b))) => (lambda (a) (lambda (b) ((f a) b))))
+|
+|
+(curry-lambda '(lambda (a b x) ((x a) (x b))))
+((lambda (a) (lambda (b) (lambda (x) ((x a) (x b)))))
+ =>
+ (lambda (a) (lambda (b) (lambda (x) ((x a) (x b))))))
+--------------------------------------------------
+problem2
+(curry-app '(f a b))
+(((f a) b) => ((f a) b))
+|
+|
+(curry-app '(+ a b c d))
+(((((+ a) b) c) d) => ((((+ a) b) c) d))
+|
+|
+(curry-app '(f a))
+((f a) => (f a))
+--------------------------------------------------
+problem3
+(pre-process 'f)
+(f => f)
+|
+|
+(pre-process '(if a b c))
+((if a b c) => (if a b c))
+|
+|
+(pre-process '(and a b))
+((if a b f) => (if a b f))
+|
+|
+(pre-process '(and a (or b c)))
+((if a (if b t c) f) => (if a (if b t c) f))
+|
+|
+(pre-process '(lambda (a) (let (x i) (and a x))))
+((lambda (a) ((lambda (x) (if a x f)) i))
+ =>
+ (lambda (a) ((lambda (x) (if a x f)) i)))
+|
+|
+(pre-process '(f a b))
+(((f a) b) => ((f a) b))
+|
+|
+(pre-process '(f (f a a) (f b b)))
+(((f ((f a) a)) ((f b) b)) => ((f ((f a) a)) ((f b) b)))
+--------------------------------------------------
+problem4
+((type-checked sqrt number?) 100)
+(10 => 10)
+|
+|
+(define type-safe-sqrt (type-checked sqrt number?))
+(type-safe-sqrt 144)
+(12 => 12)
+(type-safe-sqrt "144")
+((type mismatch #<procedure:sqrt> (#<procedure:number?>) ("144")) => error)
+|
+|
+(define type-safe-+ (type-checked + number?))
+(type-safe-+ 1 2 3 4 5)
+(15 => 15)
+(type-safe-+ 1 2 'a 4 5)
+((type mismatch #<procedure:+> (#<procedure:number?>) (1 2 a 4 5)) => error)
+|
+|
+(define safe-expt (type-checked expt number?))
+(safe-expt 5 3)
+(125 => 125)
+(safe-expt 5 "3")
+((type mismatch #<procedure:expt> (#<procedure:number?>) (5 "3")) => error)
+|
+|
+(define safe-map (type-checked map procedure? list?))
+(safe-map sqrt '(1 4 9 16))
+((1 2 3 4) => (1 2 3 4))
+(safe-map 'sqrt '(1 4 9 16))
+((type
+  mismatch
+  #<procedure:mmap>
+  (#<procedure:procedure?> #<procedure:mlist?>)
+  (sqrt (1 4 9 16)))
+ =>
+ error)
+--------------------------------------------------
+> 

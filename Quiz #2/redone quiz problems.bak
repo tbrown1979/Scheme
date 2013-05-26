@@ -1,0 +1,22 @@
+(define merge
+  (lambda (before? lst1 lst2)
+    (cond
+      ((null? lst1) (cons (car lst2) '()))
+      ((null? lst2) (cons (car lst1) '()))
+      ((before? (car lst1) (car lst2))
+       (cons (car lst1) (merge before? (cdr lst1) lst2)))
+      (else
+       (cons (car lst2) (merge before? lst1 (cdr lst2)))))))
+
+(define vector-count
+  (lambda (test? von)
+    (vector-count-helper test? von 0)))
+
+(define vector-count-helper 
+  (lambda (test? von pos)
+    (if (eq? (vector-length von) pos)
+        0
+        (if (test? (vector-ref von pos))
+            (+ 1 (vector-count-helper test? von (+ 1 pos)))
+            (vector-count-helper test? von (+ 1 pos))))))
+    

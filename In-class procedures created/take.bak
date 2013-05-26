@@ -1,0 +1,12 @@
+(define take
+  (lambda (how-many s-list)
+    (if (or (null? s-list) (zero? how-many))
+        '()
+        (cons (car s-list) 
+              (take (- how-many 1) (cdr s-list))))))
+
+(define take-symexp
+  (lambda (how-many symexp)
+    (if (symbol? symexp)
+        symexp
+        (take how-many symexp))))

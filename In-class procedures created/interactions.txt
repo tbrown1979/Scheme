@@ -1,0 +1,95 @@
+Welcome to DrRacket, version 5.3.1 [3m].
+Language: R5RS; memory limit: 128 MB.
+
+problem1
+(define address (record 'city 'state 'zipcode))
+(record-get address 'city)
+(**xx** => **xx**)
+(define address2 (record-put address2 'city "Cedar Falls"))
+(record-get address2 'city)
+("Cedar Falls" => "Cedar Falls")
+-------------------------------------------------------
+problem2
+(define small-tree (leaf-node 0))
+(define large-tree (interior-node 'foo
+                                   (interior-node 'bar
+                                                  (leaf-node 1)
+                                                  (leaf-node 2))
+                                   (leaf-node 3)))
+(define large-tree (interior-node 'foo
+                                        (interior-node 'bar
+                                                       (leaf-node 1)
+                                                       (leaf-node 2))
+                                        (leaf-node 3)))
+(define larger-tree (interior-node 'rasp
+                                   (interior-node 'lasp
+                                                  (interior-node 'clasp
+                                                                 (leaf-node 1)
+                                                                 (leaf-node 2))
+                                                  (interior-node 'sasp
+                                                                 (leaf-node 3)
+                                                                 (leaf-node 4)))
+                                   (interior-node 'zasp
+                                                  (interior-node 'grasp
+                                                                 (leaf-node 5)
+                                                                 (leaf-node 6))
+                                                  (interior-node '...
+                                                                 (leaf-node 7)
+                                                                 (leaf-node 8))) ))
+(bintree-member? 3 small-tree)
+#f
+(bintree-member? 3 large-tree)
+#t
+(bintree-member? 9 larger-tree)
+#f
+(bintree-member? 8 larger-tree)
+#t
+------------------------------------------------------- 
+problem3
+(run-length-encode '(1 1 1 1 2))
+(((1 . 4) 2) => ((1 . 4) 2))
+(run-length-encode '(o o o o o o o p p s))
+(((o . 7) (p . 2) s) => ((o . 7) (p . 2) s))
+(run-length-encode '(1 2 2 3 3 3 4 4 4 4 5 5 5 6 6 7))
+((1 (2 . 2) (3 . 3) (4 . 4) (5 . 3) (6 . 2) 7) => (1 (2 . 2) (3 . 3) (4 . 4) (5 . 3) (6 . 2) 7))
+(run-length-encode binary-file)
+(((0 . 10) (1 . 12) (0 . 6) 1 (0 . 23) (1 . 17) (0 . 15)) => ((0 . 10) (1 . 12) (0 . 6) 1 (0 . 23) (1 . 17) (0 . 15)))
+(define diff-binary-file (0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1))
+(run-length-encode diff-binary-file)
+(((0 . 2) (1 . 2) (0 . 2) (1 . 2) (0 . 2) (1 . 2) (0 . 2) (1 . 2) (0 . 2) (1 . 2))
+ =>
+ ((0 . 2) (1 . 2) (0 . 2) (1 . 2) (0 . 2) (1 . 2) (0 . 2) (1 . 2) (0 . 2) (1 . 2)))
+-------------------------------------------------------
+problem4
+(define boom-equation '(4 + 5))
+(boom/equation->left-exp boom-equation)
+(4 => 4)
+(boom/equation->right-exp boom-equation)
+(5 => 5)
+(boom/equation->operator boom-equation)
+(+ => +)
+(boom/equation? boom-equation)
+(#t => #t)
+(boom/operator? '*)
+(#t => #t)
+(boom/operator '%)
+(#<procedure:modulo> => (modulo procedure:))
+(boom/exp? boom-equation)
+(#t => #t)
+(boom/exp? 1)
+(#t => #t)
+(boom/exp? '*)
+(#f => #f)
+-------------------------------------------------------
+problem5
+(boom/eval 2)
+(2 => 2)
+(boom/eval '(2 + 4))
+(6 => 6)
+(boom/eval '((2 * 14) + (4 - 6)))
+(26 => 26)
+(boom/eval '((8 % 3) + (4 * (6 - (20 / 10)))))
+(18 => 18)
+(boom/eval '(8 & 3))
+((boom -- illegal expression: (8 & 3)) => error)
+> 

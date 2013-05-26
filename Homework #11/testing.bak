@@ -1,0 +1,10 @@
+(load "boom-language.rkt")
+
+(define boom/eval-exp
+  (lambda (exp env)
+    (cond ((boom/number? exp)     (boom/number->val exp))
+          ((boom/unary?  exp)     (boom/eval-unary exp env))
+          ((boom/binary-exp? exp) (boom/eval-binary-exp exp env))
+          ((boom/varref?     exp) (boom/eval-exp (look-up env  exp) env))
+          ((boom/with-do?    exp) (boom/eval-with-do exp env))
+          (else (list 'boom '-- 'illegal 'expression: exp) ))))
